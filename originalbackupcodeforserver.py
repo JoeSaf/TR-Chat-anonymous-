@@ -11,7 +11,6 @@ names_lock = threading.Lock()
 
 def handle_client(client_socket, client_address, name, key):
     print(f"{name} connected successfully")
-    
     with clients_lock:  # Ensuring only one thread modifies the clients list
         for c in clients:
             if c != client_socket:
@@ -24,16 +23,8 @@ def handle_client(client_socket, client_address, name, key):
             data = client_socket.recv(1024)
             data = MSG_ENC.AES_256_DECRYPT(key, data)
             data = str(data, 'utf-8')
-            
             if not data:
                 break
-
-            # Check for 'BYE' command to terminate connection
-            if data.strip().upper() == "BYE":
-                print(f"{name} sent 'BYE'. Closing connection.")
-                break
-            
-            # Forward the message to other clients
             with clients_lock:  # Ensuring thread-safe access to clients
                 for c in clients:
                     if c != client_socket:
@@ -83,24 +74,25 @@ try:
                 client_socket.close()
                 continue
 
-        # Automatically accept the connection (no user input needed)
-        client_socket.send(bytes("accept", 'utf-8'))
-        
-        # Handle public key exchange and AES key encryption
-        get_pub_key_str = str(client_socket.recv(1024), 'utf-8')
-        public_key = RSA.import_key(get_pub_key_str)
-        enc_enc_key = MSG_ENC.RSA_ENC(public_key, ENC_KEY)
-        client_socket.send(enc_enc_key)
+        acceptable = input("Do you want to accept {} [y/n] : ".format(name))
+        if acceptable == 'y' or acceptable == "Y":
+            client_socket.send(bytes("accept", 'utf-8'))
+            get_pub_key_str = str(client_socket.recv(1024), 'utf-8')
+            public_key = RSA.import_key(get_pub_key_str)
+            enc_enc_key = MSG_ENC.RSA_ENC(public_key, ENC_KEY)
+            client_socket.send(enc_enc_key)
 
-        with clients_lock:  # Ensuring thread-safe access to clients
-            clients.append(client_socket)
+            with clients_lock:  # Ensuring thread-safe access to clients
+                clients.append(client_socket)
 
-        with names_lock:  # Locking names to ensure thread-safe modification
-            names.append(name)
+            with names_lock:  # Locking names to ensure thread-safe modification
+                names.append(name)
 
-        # Start a thread to handle the client communication
-        client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address, name, ENC_KEY))
-        client_thread.start()
+            client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address, name, ENC_KEY))
+            client_thread.start()
+        else:
+            client_socket.send(bytes("decline", 'utf-8'))
+            client_socket.close()
 
 except KeyboardInterrupt:
     print("Server shutting down...")

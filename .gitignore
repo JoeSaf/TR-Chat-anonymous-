@@ -1,0 +1,11 @@
+# Ignore pyenv files and directories
+.python-version
+.python-latest
+.python-global
+*bin/
+*include/
+*lib/
+*lib64
+ngrok
+*.cfg
+*__pycache__

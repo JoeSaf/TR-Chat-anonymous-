@@ -38,7 +38,6 @@ def updater():
         print("\rType : "+sender_data[-(terminal_width-8):], end="")
     else:
         print("\r"+"Type : "+sender_data, end="")
-    
 
 def Reciver(client, key):
     while True:
@@ -49,6 +48,13 @@ def Reciver(client, key):
             str_dec_data = str_dec_data.split("<IHA089>")
             name = str_dec_data[0]
             message = str_dec_data[1]
+            
+            # Check if the server sent a "BYE" message to close the connection
+            if message.strip() == "BYE":  # Check for "BYE" (uppercase)
+                print("\rServer has closed the connection. Exiting...")
+                client.close()
+                break
+
             ll = len(sender_data)
             print("\r" + " "*(ll+7), end="")
             UI_MSG = MSG_UI.L_BOX(message, name)
@@ -69,12 +75,16 @@ def writer(client, key):
                 if sender_data == "":
                     pass
                 else:
-                    if sender_data == "exit" or sender_data == "Exit" or sender_data == "EXIT":
-                        print("\rExiting...")
+                    if sender_data == "BYE":  # Match "BYE" specifically (uppercase)
+                        print("\rSending BYE to server...")
+                        byte_sender_data = bytes(sender_data, 'utf-8')
+                        enc_sender_data = MSG_ENC.AES_256_ENCRYPT(key, byte_sender_data)
+                        client.send(enc_sender_data)
+                        # Wait for server to close the connection
                         client.close()
                         break
                     else:
-                        byte_sender_data=bytes(sender_data, 'utf-8')
+                        byte_sender_data = bytes(sender_data, 'utf-8')
                         enc_sender_data = MSG_ENC.AES_256_ENCRYPT(key, byte_sender_data)
                         client.send(enc_sender_data)
                         UI_MSG = MSG_UI.R_BOX(sender_data, "you")
@@ -92,7 +102,7 @@ def writer(client, key):
                     print("\rType : "+sender_data[-(terminal_width-8):], end="")
                 else:
                     print("\r"+"Type : "+sender_data, end="")
-            elif os_name == "Window" and char == "\b":
+            elif os_name == "Windows" and char == "\b":
                 input_data = input_data[:-1]
                 sender_data = input_data+"\b"+" "
                 terminal_width = os.get_terminal_size().columns
@@ -145,7 +155,7 @@ try:
         client.close()
         sys.exit()
     elif data == "avail":
-        print("{} is already given, please provide different name".format(name))
+        print("{} is already given, please provide a different name".format(name))
         client.close()
         sys.exit()
     else:
@@ -154,4 +164,3 @@ try:
         sys.exit()
 except KeyboardInterrupt:
     sys.exit()
-    

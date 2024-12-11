@@ -13,7 +13,7 @@ def create_public_connection():
 def CRT_PUB_CON():
     publicthread = threading.Thread(target = create_public_connection)
     publicthread.start()
-    sleep(1)
+    sleep(5)
     get_data_url = "http://localhost:4040/api/tunnels"
     get_data_req = requests.get(get_data_url)
     if get_data_req.status_code == 200:
