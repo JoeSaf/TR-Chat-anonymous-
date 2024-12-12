@@ -16,7 +16,7 @@ def Main():
     home_logo()
     print("1\tStart Server\n2\tConnect with server")
     print("Once inside a server type 'BYE' to leave")
-    print("Don't be a smartass yes type 'BYE' in capital to leave,\nim not dumb to tell you so")
+    print("Don't be a smartass, yes type 'BYE' in capital to leave,\nIm not dumb to tell you so")
     select = int(input("Select ::: "))
     if select == 1:
         import server

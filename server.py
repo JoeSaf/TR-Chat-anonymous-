@@ -15,7 +15,7 @@ def handle_client(client_socket, client_address, name, key):
     with clients_lock:  # Ensuring only one thread modifies the clients list
         for c in clients:
             if c != client_socket:
-                new_data = bytes("server<IHA089>" + name + " connected successfully", 'utf-8')
+                new_data = bytes("server<bl4km4n>" + name + " connected successfully", 'utf-8')
                 new_enc_data = MSG_ENC.AES_256_ENCRYPT(key, new_data)
                 c.sendall(new_enc_data)
 
@@ -37,7 +37,7 @@ def handle_client(client_socket, client_address, name, key):
             with clients_lock:  # Ensuring thread-safe access to clients
                 for c in clients:
                     if c != client_socket:
-                        new_data = bytes(name + "<IHA089>" + data, 'utf-8')
+                        new_data = bytes(name + "<bl4km4n>" + data, 'utf-8')
                         new_enc_data = MSG_ENC.AES_256_ENCRYPT(key, new_data)
                         c.sendall(new_enc_data)
         
@@ -53,7 +53,7 @@ def handle_client(client_socket, client_address, name, key):
     # Notify other clients that this client has left
     with names_lock:  # Locking names to ensure consistency when updating
         for c in clients:
-            leave_msg = "server<IHA089>" + name + " left this chat"
+            leave_msg = "server<bl4km4n>" + name + " left this chat"
             new_leave_msg = MSG_ENC.AES_256_ENCRYPT(key, bytes(leave_msg, 'utf-8'))
             c.sendall(new_leave_msg)
 
