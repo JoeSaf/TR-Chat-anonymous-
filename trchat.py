@@ -9,7 +9,7 @@ def home_logo():
                                           
                                           
     
-bl4k4n: The quieter you become, the more you'll hear
+bl4km4n: The quieter you become, the more you'll hear
     """)
 
 def Main():
